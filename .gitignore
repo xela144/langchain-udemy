@@ -1,0 +1,7 @@
+.aider*
+.env
+.venv
+.python-version
+data/
+__pycache__
+*.egg-info
