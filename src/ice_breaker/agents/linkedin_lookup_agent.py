@@ -1,4 +1,4 @@
-import os
+from ice_breaker.tools.tools import get_profile_url
 
 from dotenv import load_dotenv
 from langchain.agents import AgentExecutor, create_react_agent
@@ -21,7 +21,7 @@ linkedin profile page. Your answer should only contain a URL"""
     tools_for_agent = [
         Tool(
             name="Crawl Google for linkedin profile page",
-            func="?",
+            func=get_profile_url,
             description="useful for when you need the linkedin page url",
         )
     ]
