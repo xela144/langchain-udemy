@@ -9,7 +9,7 @@ from ice_breaker.output_parsers import Summary, summary_parser
 load_dotenv()
 
 
-def ice_break_with(name: str) -> Summary:
+def ice_break_with(name: str) -> tuple[Summary, str]:
     linkedin_url = lookup(name=name)
     linkedin_data = scrape_linkedin_profile(profile_url=linkedin_url, mock=True)
 
@@ -31,9 +31,9 @@ def ice_break_with(name: str) -> Summary:
 
     chain = summary_prompt_template | llm | summary_parser
 
-    summary = chain.invoke(input={"information": linkedin_data})
+    summary: Summary = chain.invoke(input={"information": linkedin_data})
 
-    return summary
+    return summary, linkedin_data.get("profile_pic_url", "")
 
 
 def main():

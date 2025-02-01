@@ -11,6 +11,9 @@ reinstall:
 develop: venv reinstall
 	$(UV_PIP) install -e ".[dev]"
 
+flask:
+	FLASK_APP=ice_breaker.app $(VENV)bin/flask run
+
 local-server:
 	$(PYTHON) -m http.server -d $(DATA_SRV)
 

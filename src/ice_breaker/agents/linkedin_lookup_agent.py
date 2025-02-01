@@ -20,7 +20,7 @@ linkedin profile page. Your answer should only contain a URL"""
 
     tools_for_agent = [
         Tool(
-            name="Crawl Google for linkedin profile page",
+            name="Crawl Google 4 linkedin profile page",
             func=get_profile_url,
             description="useful for when you need the linkedin page url",
         )
