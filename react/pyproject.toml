@@ -1,0 +1,29 @@
+[project]
+name = "langchain-udemy-react"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+
+dependencies = [
+    "langchain",
+    "langchain-openai",
+    "langchain-community",
+    "python-dotenv",
+]
+
+[project.optional-dependencies]
+dev = [
+    "black",
+    "isort",
+    "ruff",
+    "mypy",
+]
+
+jupyter = [
+    "jupyterlab",
+    "jupyterlab_vim"
+]
+
+[project.scripts]
+ice = "ice_breaker.ice_breaker:main"
