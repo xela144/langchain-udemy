@@ -27,3 +27,4 @@ jupyter = [
 
 [project.scripts]
 react = "react_udemy.main:main"
+react_ez = "react_udemy.main_ez:main"
