@@ -26,4 +26,4 @@ jupyter = [
 ]
 
 [project.scripts]
-ice = "ice_breaker.ice_breaker:main"
+react = "react_udemy.main:main"
