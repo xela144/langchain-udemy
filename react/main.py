@@ -1,13 +1,31 @@
 from dotenv import load_dotenv
 from langchain.agents.output_parsers import ReActSingleInputOutputParser
+from langchain_core.agents import AgentAction, AgentFinish
+from langchain.agents.format_scratchpad import format_log_to_str
 from langchain_openai import ChatOpenAI
 from langchain.prompts import PromptTemplate
 from langchain.agents import tool
-from langchain_core.tools import render_text_description
+from langchain_core.tools import BaseTool, render_text_description
 
 load_dotenv()
 
 
+def dir_helper(obj):
+    return [x for x in dir(obj) if not x.startswith("__")]
+
+
+def find_tool_by_name(tools: list[BaseTool], tool_name: str):
+    for tool in tools:
+        if tool.name == tool_name:
+            return tool
+    raise ValueError(f"Tool name {tool_name} not found")
+
+
+# The following becomes a Tool that the LLM can decide to use. It
+# decides by inspecting the docstring. Note: After using the @tool
+# decorator we cannot invoke the function directly; instead we
+# use the .invoke() method. Apparently, the .func() method is used
+# internally by the framework.
 @tool
 def get_text_length(text: str) -> int:
     """Returns the length of the text by characters"""
@@ -35,18 +53,55 @@ Final Answer: the final answer to the original input question
 Begin!
 
 Question: {input}
-Thought:
+Thought: {agent_scratchpad}
 """
 
-tools = [get_text_length]
+tools: list[BaseTool] = [get_text_length]
 prompt = PromptTemplate.from_template(template=template).partial(
     tools=render_text_description(tools), tool_names=", ".join([t.name for t in tools])
 )
 
 llm = ChatOpenAI(temperature=0, name="gpt-4o-mini", stop=["\nObservation"])
 
-agent = {"input": lambda x: x["input"]} | prompt | llm | ReActSingleInputOutputParser()
+intermediate_steps = []
 
-res = agent.invoke({"input": "What is the length of 'DOG' in characters?"})
+agent = (
+    {
+        "input": lambda x: x["input"],
+        "agent_scratchpad": lambda x: format_log_to_str(x["agent_scratchpad"]),
+    }
+    | prompt
+    | llm
+    | ReActSingleInputOutputParser()
+)
+
+agent_step: AgentAction | AgentFinish = agent.invoke(
+    {
+        "input": "What is the length in characters of the following word: DOG",
+        "agent_scratchpad": intermediate_steps,
+    }
+)
+print(f"{type(agent_step)=}")
+print(f"{dir_helper(agent_step)=}")
+print(f"{agent_step=}")
+if isinstance(agent_step, AgentAction):
+    tool_name = agent_step.tool
+    tool_to_use = find_tool_by_name(tools, tool_name)
+    tool_input = agent_step.tool_input
+
+    observation = tool_to_use.func(str(tool_input))
+    print(observation)
+    intermediate_steps.append((agent_step, str(observation)))
+
+
+agent_step: AgentAction | AgentFinish = agent.invoke(
+    {
+        "input": "What is the length in characters of the following word: DOG",
+        "agent_scratchpad": intermediate_steps,
+    }
+)
+
+if isinstance(agent_step, AgentFinish):
+    print(f"{agent_step.return_values=}")
+
 breakpoint()
-print(res)
