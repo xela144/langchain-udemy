@@ -1,0 +1,41 @@
+[project]
+name = "langchain-udemy-documentation-helper"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+
+dependencies = [
+    "beautifulsoup4",
+    "fastapi",
+    "jinja2",
+    "langchain",
+    "langchain-community",
+    "langchain-pinecone",
+    "langchain-openai",
+    "nltk",
+    "openai",
+    "pinecone-client",
+    "python-dotenv",
+    "streamlit",
+    "streamlit-chat",
+    "tiktoken",
+    "tqdm",
+    "unstructured",
+    "uvicorn",
+]
+
+[project.optional-dependencies]
+dev = [
+    "black",
+    "isort",
+    "ruff",
+    "mypy",
+]
+
+jupyter = [
+    "jupyterlab",
+    "jupyterlab_vim"
+]
+
+[project.scripts]
