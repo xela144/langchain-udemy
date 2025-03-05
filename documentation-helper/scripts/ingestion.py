@@ -1,17 +1,22 @@
+from pathlib import Path
 from dotenv import load_dotenv
-
-load_dotenv()
-
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import ReadTheDocsLoader
 from langchain_openai import OpenAIEmbeddings
 from langchain_pinecone import PineconeVectorStore
 
-embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
+load_dotenv()
 
 
-def ingest_docs():
-    loader = ReadTheDocsLoader("langchain-docs/api.python.langchain.com/en/latest")
+def get_embeddings_instance():
+    embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
+    return embeddings
+
+
+def ingest_docs(embedder, rtd_docs_path: Path, index_name: str):
+    if not rtd_docs_path.exists():
+        raise FileNotFoundError(f"{rtd_docs_path}")
+    loader = ReadTheDocsLoader(str(rtd_docs_path))
     raw_documents = loader.load()
     print(f"loaded {len(raw_documents)} documents")
 
@@ -23,9 +28,14 @@ def ingest_docs():
         doc.metadata.update({"source": new_url})
 
     print(f"Going to add {len(documents)} to Pinecone")
-    PineconeVectorStore.from_documents(documents, embeddings, index_name="langchain-doc-index")
+    PineconeVectorStore.from_documents(documents, embedder, index_name=index_name)
 
 
 if __name__ == "__main__":
+    import os
+
     print("running ingest_docs()")
-    ingest_docs()
+    embedder = get_embeddings_instance()
+    rtd_docs_path = Path("langchain-docs/api.python.langchain.com/en/latest")
+    index_name = os.environ["PINECONE_INDEX_NAME"]
+    ingest_docs(embedder, rtd_docs_path, index_name)
