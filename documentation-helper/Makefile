@@ -29,3 +29,7 @@ lint-fix:
 
 .PHONY: check
 check: format lint
+
+.PHONY: streamlit
+streamlit:
+	$(VENV)/bin/streamlit run src/documentation_helper/main.py

@@ -32,10 +32,3 @@ dev = [
     "ruff",
     "mypy",
 ]
-
-jupyter = [
-    "jupyterlab",
-    "jupyterlab_vim"
-]
-
-[project.scripts]
