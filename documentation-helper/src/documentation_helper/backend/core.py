@@ -10,7 +10,9 @@ import os
 
 load_dotenv()
 
-INDEX_NAME = os.environ["PINECONE_INDEX_NAME"]
+INDEX_NAME = os.environ.get("PINECONE_INDEX_NAME")
+if INDEX_NAME is None:
+    raise EnvironmentError("PINECONE_INDEX_NAME not set")
 
 
 def run_llm(query: str, chat_history=tuple[dict[Any, Any]]):

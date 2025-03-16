@@ -1,11 +1,7 @@
 VENV := .venv/
 PYTHON := $(VENV)bin/python
 UV_PIP := uv pip
--include .env
 
-
-reinstall:
-	$(UV_PIP) install -e .
 
 develop: venv reinstall
 	$(UV_PIP) install -e ".[dev]"
